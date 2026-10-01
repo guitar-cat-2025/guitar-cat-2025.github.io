@@ -1,6 +1,6 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>ギター指板 音名ハイライト Ver.25</title>
+<title>ギター指板 音名ハイライト Ver.26</title>
 <style>
 *{box-sizing:border-box}:root{--bg:#101114;--panel:#1b1d22;--board:#20262c;--line:#aeb4ba;--muted:#969ba2}
 body{margin:0;background:var(--bg);color:#f5f5f6;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}
@@ -10,7 +10,12 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;appeara
 .note-btn.selected{border-color:#fff;box-shadow:inset 0 0 0 1px #fff}.colors{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.color-btn{display:flex;align-items:center;justify-content:center;gap:5px}.color-btn.active{border-color:#fff;box-shadow:inset 0 0 0 1px #fff}
 .color-btn i{width:12px;height:12px;border-radius:50%;border:1px solid #ddd}.y{background:#ffd84d}.r{background:#ff5c5c}.b{background:#55a8ff}.g{background:#58d47b}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:5px}.actions.three{grid-template-columns:repeat(3,1fr)}.actions.four{grid-template-columns:repeat(4,1fr)}.scale-menu{display:none;grid-template-columns:repeat(2,1fr);gap:5px;margin-top:6px;padding-top:6px;border-top:1px solid #353941}
-.scale-menu.show{display:grid}
+.scale-menu.show{display:block}
+.preset-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:6px}
+.preset-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}
+.preset-tab.active{background:#eee;color:#111}
+.preset-grid button{min-height:34px}
+.preset-grid small{font-size:8px;opacity:.75;font-weight:700}
 #scaleBtn.active{background:#eee;color:#111}
 .root-hint{text-align:center;height:0;overflow:hidden;color:#ffd84d;font-size:10px;font-weight:700;transition:.15s}.root-hint.show{height:18px;padding-top:5px}#degreeBtn.active{background:#eee;color:#111}.help{text-align:center;color:#858990;font-size:10px;margin:5px 0 8px}
 
@@ -65,10 +70,27 @@ linear-gradient(to bottom,
 <button onclick="clearAll()">全解除</button>
 </div>
 <div id="scaleMenu" class="scale-menu">
-  <button onclick="chooseScale('major')">メジャー</button>
-  <button onclick="chooseScale('minor')">マイナー</button>
-  <button onclick="chooseScale('majorPent')">メジャーペンタ</button>
-  <button onclick="chooseScale('minorPent')">マイナーペンタ</button>
+  <div class="preset-tabs">
+    <button id="scaleTab" class="preset-tab active" onclick="showPresetTab('scale')">スケール</button>
+    <button id="chordTab" class="preset-tab" onclick="showPresetTab('chord')">コード</button>
+  </div>
+  <div id="scalePresets" class="preset-grid">
+    <button onclick="chooseScale('major')">メジャー</button>
+    <button onclick="chooseScale('minor')">マイナー</button>
+    <button onclick="chooseScale('majorPent')">メジャーペンタ</button>
+    <button onclick="chooseScale('minorPent')">マイナーペンタ</button>
+  </div>
+  <div id="chordPresets" class="preset-grid" style="display:none">
+    <button onclick="chooseChord('major')">Major<br><small>1・3・5</small></button>
+    <button onclick="chooseChord('minor')">minor<br><small>1・♭3・5</small></button>
+    <button onclick="chooseChord('7')">7<br><small>1・3・5・♭7</small></button>
+    <button onclick="chooseChord('maj7')">maj7<br><small>1・3・5・7</small></button>
+    <button onclick="chooseChord('m7')">m7<br><small>1・♭3・5・♭7</small></button>
+    <button onclick="chooseChord('sus4')">sus4<br><small>1・4・5</small></button>
+    <button onclick="chooseChord('sus2')">sus2<br><small>1・2・5</small></button>
+    <button onclick="chooseChord('dim')">dim<br><small>1・♭3・♭5</small></button>
+    <button onclick="chooseChord('aug')">aug<br><small>1・3・♯5</small></button>
+  </div>
 </div>
 <div id="rootHint" class="root-hint"></div>
 </div>
@@ -85,6 +107,8 @@ let waitingForRoot=false;
 let rootPitch=null;
 let pendingScale=null;
 let activeScale=null;
+let pendingChord=null;
+let activeChord=null;
 
 const cv={yellow:"#ffd84d",red:"#ff5c5c",blue:"#55a8ff",green:"#58d47b"};
 const sharpNames=["C","C♯","D","D♯","E","F","F♯","G","G♯","A","A♯","B"];
@@ -104,6 +128,28 @@ const scaleNames={
  majorPent:"メジャーペンタ",
  minorPent:"マイナーペンタ"
 };
+const chords={
+ major:[0,4,7],
+ minor:[0,3,7],
+ "7":[0,4,7,10],
+ maj7:[0,4,7,11],
+ m7:[0,3,7,10],
+ sus4:[0,5,7],
+ sus2:[0,2,7],
+ dim:[0,3,6],
+ aug:[0,4,8]
+};
+const chordNames={
+ major:"Major",
+ minor:"minor",
+ "7":"7",
+ maj7:"maj7",
+ m7:"m7",
+ sus4:"sus4",
+ sus2:"sus2",
+ dim:"dim",
+ aug:"aug"
+};
 
 function toggleFretRange(){
  fretStart=fretStart===0?12:0;
@@ -121,12 +167,51 @@ function toggleAccidental(){
  document.getElementById("accBtn").textContent=accidentalMode==="sharp"?"♯ 表示":"♭ 表示";
  if(activeScale && rootPitch!==null){
    setHint(scaleNames[activeScale]+" / ルート："+(accidentalMode==="sharp"?sharpNames[rootPitch]:flatNames[rootPitch]));
+ }else if(activeChord && rootPitch!==null){
+   setHint((accidentalMode==="sharp"?sharpNames[rootPitch]:flatNames[rootPitch])+chordNames[activeChord]);
  }else if(displayMode!=="note" && rootPitch!==null){
    setHint("ルート："+(accidentalMode==="sharp"?sharpNames[rootPitch]:flatNames[rootPitch]));
  }
  render();
 }
 
+
+function showPresetTab(tab){
+ const scale=tab==="scale";
+ document.getElementById("scalePresets").style.display=scale?"grid":"none";
+ document.getElementById("chordPresets").style.display=scale?"none":"grid";
+ document.getElementById("scaleTab").classList.toggle("active",scale);
+ document.getElementById("chordTab").classList.toggle("active",!scale);
+}
+
+function chooseChord(type){
+ pendingChord=type;
+ pendingScale=null;
+ waitingForRoot=true;
+ displayMode="note";
+ rootPitch=null;
+ document.getElementById("degreeBtn").classList.remove("active");
+ document.getElementById("degreeBtn").textContent="度数";
+ document.getElementById("scaleMenu").classList.remove("show");
+ document.getElementById("scaleBtn").classList.remove("active");
+ setHint(chordNames[type]+"：ルート音を選んでください");
+ render();
+}
+
+function applyChord(root,type){
+ a.clear();
+ chords[type].forEach(interval=>{
+   const pitch=(root+interval)%12;
+   a.set(pitch,interval===0?"red":"yellow");
+ });
+ activeChord=type;
+ activeScale=null;
+ rootPitch=root;
+ displayMode="note";
+ document.getElementById("degreeBtn").textContent="度数";
+ setHint((accidentalMode==="sharp"?sharpNames[root]:flatNames[root])+chordNames[type]);
+ render();
+}
 
 function toggleScaleMenu(){
  const menu=document.getElementById("scaleMenu");
@@ -142,6 +227,8 @@ function toggleScaleMenu(){
 
 function chooseScale(type){
  pendingScale=type;
+ pendingChord=null;
+ activeChord=null;
  waitingForRoot=true;
  displayMode="note";
  rootPitch=null;
@@ -160,6 +247,7 @@ function applyScale(root,type){
    a.set(pitch, interval===0 ? "red" : "yellow");
  });
  activeScale=type;
+ activeChord=null;
  rootPitch=root;
  displayMode="note";
  document.getElementById("degreeBtn").textContent="度数";
@@ -196,6 +284,13 @@ function setHint(text){
 }
 
 function chooseNote(p){
+ if(waitingForRoot && pendingChord){
+   const type=pendingChord;
+   pendingChord=null;
+   waitingForRoot=false;
+   applyChord(p,type);
+   return;
+ }
  if(waitingForRoot && pendingScale){
    const type=pendingScale;
    pendingScale=null;
@@ -215,6 +310,7 @@ function chooseNote(p){
    return;
  }
  activeScale=null;
+ activeChord=null;
  if(a.get(p)===color) a.delete(p);
  else a.set(p,color);
  render();
@@ -224,6 +320,8 @@ function clearAll(){
  a.clear();
  pendingScale=null;
  activeScale=null;
+ pendingChord=null;
+ activeChord=null;
  waitingForRoot=false;
  displayMode="note";
  rootPitch=null;
