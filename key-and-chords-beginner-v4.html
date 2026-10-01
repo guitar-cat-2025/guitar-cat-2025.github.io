@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>キーとコードの関係 | Guitar Tools</title>
+<style>
+:root{--bg:#090b10;--panel:#11151d;--panel2:#171c26;--line:#293140;--text:#f4f6fb;--muted:#9ca7b8;--accent:#7bdcff;--accent2:#b18cff;--good:#83e6ae;--shadow:0 18px 60px #0008}
+*{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 50% 0,#182030 0,#0b0e14 36%,var(--bg) 72%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;min-height:100vh}
+header{max-width:1080px;margin:auto;padding:24px 18px 6px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.brand{font-weight:850;letter-spacing:.04em}.brand small{display:block;color:var(--muted);font-size:11px;font-weight:600;margin-top:4px}
+button{font:inherit;color:inherit}.help{border:1px solid var(--line);background:#111722;border-radius:999px;padding:8px 12px;color:var(--muted)}
+main{max-width:1080px;margin:auto;padding:12px 16px 42px}
+.hero{text-align:center;margin:8px 0 14px}.hero h1{font-size:clamp(25px,5vw,42px);margin:0 0 5px}.hero p{color:var(--muted);margin:0;font-size:14px}
+.layout{display:grid;grid-template-columns:minmax(320px,1.15fr) minmax(290px,.85fr);gap:18px;align-items:start}
+.card{background:linear-gradient(180deg,#121722e8,#0e121ae8);border:1px solid #252d3a;border-radius:24px;box-shadow:var(--shadow)}
+.wheelCard{padding:14px}.wheelWrap{position:relative;aspect-ratio:1;max-width:610px;margin:auto}
+#wheel{width:100%;height:100%;display:block;filter:drop-shadow(0 14px 28px #0008)}
+.centerInfo{position:absolute;inset:34%;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none}
+.centerInfo .key{font-size:clamp(36px,8vw,64px);font-weight:900;line-height:1}.centerInfo .label{font-size:12px;color:var(--muted);margin-top:5px}.centerInfo .relative{font-size:14px;margin-top:8px}.hint{text-align:center;color:var(--muted);font-size:12px;margin:5px 0 0}
+.info{padding:18px}.eyebrow{color:var(--accent);font-size:12px;font-weight:800;letter-spacing:.13em}.info h2{margin:5px 0 2px;font-size:28px}.sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+.chords{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.chord{min-width:0;border:1px solid var(--line);background:var(--panel2);border-radius:14px;padding:10px 5px;text-align:center;cursor:pointer;transition:.15s}.chord:hover,.chord.active{transform:translateY(-1px);border-color:var(--accent);background:#172330}.degree{font-size:10px;color:var(--muted)}.name{font-size:18px;font-weight:850;margin-top:2px}
+.detail{margin-top:14px;padding:16px;border:1px solid var(--line);border-radius:18px;background:#0b0f16}.detailTop{display:flex;justify-content:space-between;align-items:center;gap:12px}.bigChord{font-size:30px;font-weight:900}.quality{font-size:12px;color:var(--muted)}.notes{display:flex;gap:8px;margin-top:13px;flex-wrap:wrap}.note{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#1c2634;border:1px solid #344255;font-weight:850}.note:first-child{border-color:var(--accent);box-shadow:0 0 0 2px #7bdcff22}
+.legend{margin-top:15px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.legend div{font-size:11px;color:var(--muted);background:#10151e;border:1px solid #222a36;border-radius:10px;padding:8px;text-align:center}
+.tip{margin-top:14px;padding:13px 14px;border-left:3px solid var(--accent2);background:#14131c;border-radius:10px;font-size:13px;line-height:1.65;color:#cbd2de}
+.modal{position:fixed;inset:0;background:#000a;display:none;place-items:center;padding:20px;z-index:5}.modal.show{display:grid}.modalBox{max-width:520px;background:#121722;border:1px solid #303949;border-radius:20px;padding:20px;box-shadow:var(--shadow)}.modalBox h3{margin-top:0}.modalBox p{color:#c4ccda;line-height:1.75;font-size:14px}.close{width:100%;border:1px solid var(--line);background:#1b2330;border-radius:12px;padding:10px;cursor:pointer}
+footer{text-align:center;color:#667184;font-size:11px;margin-top:22px}
+@media(max-width:780px){header{padding-top:16px}.layout{grid-template-columns:1fr}.wheelCard{padding:8px}.info{padding:16px}.chords{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:390px){.chord{padding:8px 3px}.name{font-size:16px}.centerInfo{inset:33%}}
+
+#fallbackKeys{display:block;position:absolute;inset:0;z-index:3}
+.fkey{position:absolute;width:58px;height:42px;margin:-21px -29px;border:1px solid #344052;background:#151b25;border-radius:12px;font-weight:850;cursor:pointer;z-index:2}.fkey.active{border-color:var(--accent);background:#263b4c;box-shadow:0 0 0 2px #7bdcff22}.fkey small{display:block;font-size:9px;color:var(--muted);font-weight:650}
+
+
+.ringGuide{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:1px solid #293140;border-radius:50%;pointer-events:none}
+.ring1{width:84%;height:84%}.ring2{width:58%;height:58%;opacity:.7}
+@media(max-width:430px){
+ .fkey{width:54px;height:42px;margin:-21px -27px;font-size:15px}
+}
+#fallbackKeys .fkey:nth-child(1){left:50.000%;top:8.000%}
+#fallbackKeys .fkey:nth-child(2){left:71.000%;top:13.627%}
+#fallbackKeys .fkey:nth-child(3){left:86.373%;top:29.000%}
+#fallbackKeys .fkey:nth-child(4){left:92.000%;top:50.000%}
+#fallbackKeys .fkey:nth-child(5){left:86.373%;top:71.000%}
+#fallbackKeys .fkey:nth-child(6){left:71.000%;top:86.373%}
+#fallbackKeys .fkey:nth-child(7){left:50.000%;top:92.000%}
+#fallbackKeys .fkey:nth-child(8){left:29.000%;top:86.373%}
+#fallbackKeys .fkey:nth-child(9){left:13.627%;top:71.000%}
+#fallbackKeys .fkey:nth-child(10){left:8.000%;top:50.000%}
+#fallbackKeys .fkey:nth-child(11){left:13.627%;top:29.000%}
+#fallbackKeys .fkey:nth-child(12){left:29.000%;top:13.627%}
+
+.beginnerLead{margin:16px 0 10px}.beginnerLead b{display:block;font-size:15px}.beginnerLead span{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+.chord.primary{border-color:#4e8196;background:#14232c}.chord.primary .degree{color:#7bdcff}
+.theoryTag{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;background:#171d27;color:#7f8a9b;font-size:10px}
+</style>
+</head>
+<body>
+<header><div class="brand">GUITAR TOOLS<small>Interactive Music Theory</small></div><button class="help" id="helpBtn">？ 使い方</button></header>
+<main>
+<section class="hero"><h1>キーとコードの関係</h1><p>むずかしい言葉は後回し。まずは好きなキーを選んでみよう。</p>
+<button class="help" id="fifthsBtn" style="margin-top:12px">「五度圏」ってなに？</button></section>
+<div class="layout">
+<section class="card wheelCard">
+<div class="wheelWrap">
+<div id="fallbackKeys" aria-label="キーを選ぶ"><button class="fkey active" data-key="0"><b>C</b><small>Am</small></button><button class="fkey" data-key="1"><b>G</b><small>Em</small></button><button class="fkey" data-key="2"><b>D</b><small>Bm</small></button><button class="fkey" data-key="3"><b>A</b><small>F♯m</small></button><button class="fkey" data-key="4"><b>E</b><small>C♯m</small></button><button class="fkey" data-key="5"><b>B</b><small>G♯m</small></button><button class="fkey" data-key="6"><b>F♯</b><small>D♯m</small></button><button class="fkey" data-key="7"><b>D♭</b><small>B♭m</small></button><button class="fkey" data-key="8"><b>A♭</b><small>Fm</small></button><button class="fkey" data-key="9"><b>E♭</b><small>Cm</small></button><button class="fkey" data-key="10"><b>B♭</b><small>Gm</small></button><button class="fkey" data-key="11"><b>F</b><small>Dm</small></button></div>
+<div class="ringGuide ring1"></div>
+<div class="ringGuide ring2"></div>
+<div class="centerInfo"><div class="key" id="centerKey">C</div><div class="label">選んでいるキー</div><div class="relative" id="relative">同じ音を使うマイナーキー · Am</div></div>
+</div>
+<p class="hint">外側の大きな文字がメジャーキー。小さな文字は同じ音を使うマイナーキー</p>
+</section>
+<section class="card info">
+<div class="eyebrow">選んだキー</div><h2 id="title">C Major</h2><div class="sub" id="signature">♯ / ♭ なし · 同じ音を使うマイナーキー: Am</div>
+<div class="beginnerLead"><b id="usableTitle">Cメジャーで使いやすい7つのコード</b><span>まずは青く光る「1・4・5番目」から弾いてみよう</span></div>
+<div class="chords" id="chords"></div>
+<div class="detail"><div class="detailTop"><div><div class="bigChord" id="bigChord">C</div><div class="quality" id="quality">I · Major</div></div><div style="text-align:right"><div class="degree" style="font-size:11px">このコードを作る音</div><div style="font-size:12px;color:var(--muted)">3つの音</div></div></div><div class="notes" id="notes"></div></div>
+<div class="legend"><div>1・4・5番目<br>明るいコード</div><div>2・3・6番目<br>暗めのコード</div><div>7番目<br>不安定なコード</div></div>
+<div class="tip" id="tip">💡 Cメジャーでは、まず <b>C → F → G → C</b> を弾いてみると「1番目 → 4番目 → 5番目 → 1番目」という、とてもよく使われる流れを耳で確認できます。</div>
+</section>
+</div>
+<footer>Circle of Fifths · Guitar Tools</footer>
+</main>
+<div class="modal" id="modal"><div class="modalBox"><h3>このツールの使い方</h3><p>① 五度圏の外側からキーを選びます。<br>② そのキーで自然に使える7つのダイアトニックコードが表示されます。<br>③ コードをタップすると、度数・種類・このコードを作る音を確認できます。<br><br>隣り合うキーほど共通する音が多いのも五度圏のポイントです。</p><button class="close" id="closeBtn">閉じる</button></div></div>
+<div class="modal" id="fifthsModal"><div class="modalBox"><h3>「五度圏」ってなに？</h3><p><b>12個のキーを、関係が近いもの同士で円に並べた地図</b>みたいなものです。<br><br>たとえば C のとなりは F と G。この3つは音楽の中でとても仲がよく、よく一緒に使われます。<br><br>今は名前や仕組みを暗記しなくてOK。<b>「円で隣り合っているキーは仲がいい」</b>くらいから始めましょう。</p><button class="close" id="fifthsClose">わかった！</button></div></div>
+<script>
+const KEYS=[
+ {k:"C",rel:"Am",sig:"♯ / ♭ なし",scale:["C","D","E","F","G","A","B"]},
+ {k:"G",rel:"Em",sig:"♯ 1個",scale:["G","A","B","C","D","E","F♯"]},
+ {k:"D",rel:"Bm",sig:"♯ 2個",scale:["D","E","F♯","G","A","B","C♯"]},
+ {k:"A",rel:"F♯m",sig:"♯ 3個",scale:["A","B","C♯","D","E","F♯","G♯"]},
+ {k:"E",rel:"C♯m",sig:"♯ 4個",scale:["E","F♯","G♯","A","B","C♯","D♯"]},
+ {k:"B",rel:"G♯m",sig:"♯ 5個",scale:["B","C♯","D♯","E","F♯","G♯","A♯"]},
+ {k:"F♯",rel:"D♯m",sig:"♯ 6個",scale:["F♯","G♯","A♯","B","C♯","D♯","E♯"]},
+ {k:"D♭",rel:"B♭m",sig:"♭ 5個",scale:["D♭","E♭","F","G♭","A♭","B♭","C"]},
+ {k:"A♭",rel:"Fm",sig:"♭ 4個",scale:["A♭","B♭","C","D♭","E♭","F","G"]},
+ {k:"E♭",rel:"Cm",sig:"♭ 3個",scale:["E♭","F","G","A♭","B♭","C","D"]},
+ {k:"B♭",rel:"Gm",sig:"♭ 2個",scale:["B♭","C","D","E♭","F","G","A"]},
+ {k:"F",rel:"Dm",sig:"♭ 1個",scale:["F","G","A","B♭","C","D","E"]}
+];
+const deg=["I","ii","iii","IV","V","vi","vii°"], qual=["Major","minor","minor","Major","Major","minor","diminished"];
+let selected=0, chordSelected=0;
+const svg=null;
+function polar(cx,cy,r,a){let x=cx+r*Math.cos((a-90)*Math.PI/180),y=cy+r*Math.sin((a-90)*Math.PI/180);return [x,y]}
+function arcPath(r1,r2,a1,a2){let p1=polar(300,300,r2,a1),p2=polar(300,300,r2,a2),p3=polar(300,300,r1,a2),p4=polar(300,300,r1,a1);return `M${p1} A${r2} ${r2} 0 0 1 ${p2} L${p3} A${r1} ${r1} 0 0 0 ${p4}Z`}
+
+function drawFallback(){
+ document.querySelectorAll("#fallbackKeys .fkey").forEach((b,i)=>{
+   b.classList.toggle("active",i===selected);
+   b.onclick=()=>{selected=i;chordSelected=0;render()};
+ });
+}
+function drawWheel(){
+ svg.innerHTML="";
+ KEYS.forEach((x,i)=>{
+  let a1=i*30-15,a2=i*30+15,active=i===selected;
+  let g=document.createElementNS("http://www.w3.org/2000/svg","g"); g.style.cursor="pointer";
+  let path=document.createElementNS("http://www.w3.org/2000/svg","path");
+  path.setAttribute("d",arcPath(205,286,a1,a2)); path.setAttribute("fill",active?"#263b4c":"#151b25"); path.setAttribute("stroke",active?"#7bdcff":"#303949"); path.setAttribute("stroke-width",active?"3":"1.5");
+  let [tx,ty]=polar(300,300,247,i*30); let text=document.createElementNS("http://www.w3.org/2000/svg","text");
+  text.setAttribute("x",tx);text.setAttribute("y",ty+9);text.setAttribute("text-anchor","middle");text.setAttribute("fill",active?"#f6fbff":"#d5dbe5");text.setAttribute("font-size","30");text.setAttribute("font-weight","800");text.textContent=x.k;
+  let [mx,my]=polar(300,300,185,i*30); let min=document.createElementNS("http://www.w3.org/2000/svg","text");
+  min.setAttribute("x",mx);min.setAttribute("y",my+6);min.setAttribute("text-anchor","middle");min.setAttribute("fill",active?"#7bdcff":"#8f9aad");min.setAttribute("font-size","16");min.setAttribute("font-weight","700");min.textContent=x.rel;
+  g.append(path,text,min);g.onclick=()=>{selected=i;chordSelected=0;render()};svg.append(g);
+ });
+ let c=document.createElementNS("http://www.w3.org/2000/svg","circle");c.setAttribute("cx","300");c.setAttribute("cy","300");c.setAttribute("r","150");c.setAttribute("fill","#0d1118");c.setAttribute("stroke","#293140");c.setAttribute("stroke-width","2");svg.append(c);
+}
+function chordName(i){
+ const root=KEYS[selected].scale[i];
+ if(i===6)return root+"dim";
+ return (i===1||i===2||i===5)?root+"m":root;
+}
+function chordNotes(i){let s=KEYS[selected].scale;return [s[i],s[(i+2)%7],s[(i+4)%7]]}
+function renderInfo(){
+ let K=KEYS[selected];
+ document.getElementById("centerKey").textContent=K.k;
+ document.getElementById("relative").textContent="同じ音を使うマイナーキー · "+K.rel;
+ document.getElementById("title").textContent=K.k+" Major";
+ document.getElementById("signature").textContent=K.sig+" · 同じ音を使うマイナーキー: "+K.rel;
+ const ut=document.getElementById("usableTitle"); if(ut)ut.textContent=K.k+"メジャーで使いやすい7つのコード";
+ let box=document.getElementById("chords");box.innerHTML="";
+ for(let i=0;i<7;i++){let b=document.createElement("button");b.className="chord"+(i===chordSelected?" active":"");b.classList.toggle("primary",[0,3,4].includes(i));b.innerHTML=`<div class="degree">${i+1}番目のコード</div><div class="name">${chordName(i)}</div><div class="theoryTag">理論名 ${deg[i]}</div>`;b.onclick=()=>{chordSelected=i;renderInfo()};box.append(b)}
+ let n=chordName(chordSelected);document.getElementById("bigChord").textContent=n;document.getElementById("quality").innerHTML=(qual[chordSelected]==="Major"?"明るい響き":qual[chordSelected]==="minor"?"暗めの響き":"不安定な響き")+`<br><span style="font-size:10px;opacity:.65">理論では ${deg[chordSelected]} · ${qual[chordSelected]}</span>`;
+ document.getElementById("notes").innerHTML=chordNotes(chordSelected).map(x=>`<div class="note">${x}</div>`).join("");
+ document.getElementById("tip").innerHTML=`💡 ${K.k}メジャーでは、まず <b>${chordName(0)} → ${chordName(3)} → ${chordName(4)} → ${chordName(0)}</b> を弾いてみると「1番目 → 4番目 → 5番目 → 1番目」という、とてもよく使われる流れを耳で確認できます。`;
+}
+function render(){drawFallback();renderInfo()} render();
+const modal=document.getElementById("modal");document.getElementById("helpBtn").onclick=()=>modal.classList.add("show");document.getElementById("closeBtn").onclick=()=>modal.classList.remove("show");modal.onclick=e=>{if(e.target===modal)modal.classList.remove("show")};
+const fm=document.getElementById("fifthsModal");document.getElementById("fifthsBtn").onclick=()=>fm.classList.add("show");document.getElementById("fifthsClose").onclick=()=>fm.classList.remove("show");fm.onclick=e=>{if(e.target===fm)fm.classList.remove("show")};
+</script>
+</body></html>
