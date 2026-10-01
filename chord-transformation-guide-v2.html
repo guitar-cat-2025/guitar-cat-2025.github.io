@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>コード変化図鑑</title>
+<style>
+:root{--bg:#070b10;--card:#111823;--card2:#0c121a;--line:#283446;--text:#f2f5f9;--muted:#96a2b4;--a:#68d8ff;--b:#b394ff;--c:#78e0ad;--warn:#ffd36a}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(#0b111a,#05080d);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}
+.wrap{max-width:780px;margin:auto;padding:14px 12px 28px}
+header{text-align:center;margin-bottom:10px}h1{font-size:25px;margin:2px 0 4px}.sub{color:var(--muted);font-size:12px;line-height:1.45}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:12px;margin-top:9px}
+.label{font-size:11px;letter-spacing:.18em;color:var(--a);font-weight:900}
+.rootRow,.typeRow{display:flex;gap:8px;overflow-x:auto;padding:6px 0 2px;scrollbar-width:none}.rootRow::-webkit-scrollbar,.typeRow::-webkit-scrollbar{display:none}
+button{font:inherit}.pick{flex:0 0 auto;border:1px solid #344257;background:#121b27;color:#cbd4e0;border-radius:13px;padding:7px 11px;font-weight:800}.pick.on{background:#dfeaf3;color:#0b1118;border-color:#dfeaf3}
+.hero{text-align:center;padding:8px 4px 2px}.code{font-size:48px;line-height:1;font-weight:950;margin:4px 0 8px}.codeName{color:var(--muted);font-size:14px}
+.tones,.degrees{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:10px 0 5px}
+.tone{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--a);font-size:18px;font-weight:950;background:#15202c}.tone:nth-child(2){border-color:var(--b)}.tone:nth-child(3){border-color:var(--c)}.tone:nth-child(4){border-color:var(--warn)}
+.degree{min-width:44px;border:1px solid #344154;border-radius:12px;padding:5px 8px;color:#c7d0dc;font-weight:800}
+.change{margin-top:9px;background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:10px;text-align:center;line-height:1.8}.change strong{color:var(--a)}
+.tip{margin-top:8px;background:#15121d;border-left:4px solid var(--b);border-radius:12px;padding:10px 12px;line-height:1.75}.tipTitle{font-size:11px;color:#c5b2ff;font-weight:900;letter-spacing:.14em;margin-bottom:5px}
+.compare{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-top:8px}.compareBox{background:#0b1118;border:1px solid var(--line);border-radius:12px;padding:9px;text-align:center}.compareBox b{font-size:18px}.arrow{color:#718096}
+.note{color:#7f8b9c;font-size:11px;line-height:1.65;margin:8px 4px 0}
+@media(max-width:520px){.wrap{padding:12px 10px 25px}.panel{padding:10px;border-radius:16px}.code{font-size:44px}.tone{width:50px;height:50px}.compare{grid-template-columns:1fr auto 1fr}}
+.listen{display:flex;justify-content:center;margin:8px 0 2px}.listen button{border:1px solid #42677a;background:#142631;color:#eaf8ff;border-radius:999px;padding:8px 16px;font-weight:900;font-size:12px;cursor:pointer}.listen button:active{transform:scale(.97)}</style>
+</head>
+<body><main class="wrap">
+<header><div class="label">GUITAR TOOLS / BEGINNER</div><h1>コード変化図鑑</h1><div class="sub">コードは「丸暗記」じゃなく、<b>どの音が変わったか</b>で覚えてみよう。</div></header>
+
+<section class="panel">
+<div class="label">① ルートを選ぶ</div>
+<div class="rootRow" id="roots"></div>
+<div class="label" style="margin-top:9px">② コードの種類を選ぶ</div>
+<div class="typeRow" id="types"></div>
+</section>
+
+<section class="panel">
+<div class="hero"><div class="code" id="code">C</div><div class="codeName" id="codeName">Cメジャー</div></div>
+<div class="tones" id="tones"><span class="tone">C</span><span class="tone">E</span><span class="tone">G</span></div>
+<div class="degrees" id="degrees"><span class="degree">1</span><span class="degree">3</span><span class="degree">5</span></div><div class="listen"><button id="listenBtn">🎸 このコードを聴く</button></div>
+<div class="change" id="change"><strong>基本形</strong><br>Cメジャーは「1・3・5」からできています。</div>
+<div class="tip"><div class="tipTitle">💡 SOUND TIPS</div><div id="tip">明るく安定した響き。メジャーコードの基本になる形です。</div></div>
+<div class="compare">
+ <div class="compareBox"><small>基本</small><br><b id="baseCode">C</b><br><span id="baseTones">C・E・G</span></div>
+ <div class="arrow">→</div>
+ <div class="compareBox"><small>変化後</small><br><b id="afterCode">C</b><br><span id="afterTones">C・E・G</span></div>
+</div>
+<div class="note">※「明るい」「切ない」などの印象は、曲・演奏・音域によって変わります。ここではコード単体で感じやすい特徴を初心者向けに表現しています。</div>
+</section>
+</main>
+<script>
+const roots=["C","C#","D","Eb","E","F","F#","G","Ab","A","Bb","B"];
+const pc=["C","C#","D","Eb","E","F","F#","G","Ab","A","Bb","B"];
+const defs=[
+ {id:"",label:"Major",jp:"メジャー",ints:[0,4,7],deg:["1","3","5"],change:"基本形。「1・3・5」で作ります。",tip:"明るく安定した響き。メジャーコードの基本になる形です。"},
+ {id:"m",label:"m",jp:"マイナー",ints:[0,3,7],deg:["1","♭3","5"],change:"3度を半音下げる：3 → ♭3",tip:"暗さや切なさを感じやすい響き。メジャーとの違いは、まず「3度」に注目。"},
+ {id:"7",label:"7",jp:"セブンス",ints:[0,4,7,10],deg:["1","3","5","♭7"],change:"基本形に ♭7 を追加",tip:"ブルージーで、次のコードへ進みたくなるような緊張感が出やすいコード。"},
+ {id:"maj7",label:"maj7",jp:"メジャーセブンス",ints:[0,4,7,11],deg:["1","3","5","7"],change:"基本形に 7 を追加",tip:"透明感や都会的・おしゃれな雰囲気を感じやすい響き。"},
+ {id:"m7",label:"m7",jp:"マイナーセブンス",ints:[0,3,7,10],deg:["1","♭3","5","♭7"],change:"3 → ♭3 ＋ ♭7 を追加",tip:"マイナーの暗さに、やわらかさや落ち着きが加わったように感じやすい響き。"},
+ {id:"sus4",label:"sus4",jp:"サスフォー",ints:[0,5,7],deg:["1","4","5"],change:"3度を4度に置き換える：3 → 4",tip:"宙に浮いたような、まだ終わっていない感じ。Majorへ戻すと解決感が分かりやすい。"},
+ {id:"sus2",label:"sus2",jp:"サスツー",ints:[0,2,7],deg:["1","2","5"],change:"3度を2度に置き換える：3 → 2",tip:"開放感や爽やかさを感じやすい響き。3度がないのでMajor/Minor感が薄くなります。"},
+ {id:"dim",label:"dim",jp:"ディミニッシュ",ints:[0,3,6],deg:["1","♭3","♭5"],change:"3 → ♭3、5 → ♭5",tip:"強い不安定さや緊張感を作りやすいコード。次のコードへつなぐ場面でも使われます。"},
+ {id:"aug",label:"aug",jp:"オーギュメント",ints:[0,4,8],deg:["1","3","♯5"],change:"5度を半音上げる：5 → ♯5",tip:"不思議で落ち着かない、少し浮遊するような響きを感じやすいコード。"},
+ {id:"add9",label:"add9",jp:"アドナインス",ints:[0,4,7,2],deg:["1","3","5","9"],change:"基本形に 9度を追加",tip:"メジャーの明るさを残しながら、広がりや爽やかさを足しやすいコード。"}
+];
+let root=0,type=0;
+const R=document.getElementById("roots"),T=document.getElementById("types");
+roots.forEach((x,i)=>{let b=document.createElement("button");b.className="pick";b.textContent=x;b.onclick=()=>{root=i;render()};R.append(b)});
+defs.forEach((x,i)=>{let b=document.createElement("button");b.className="pick";b.textContent=x.label;b.onclick=()=>{type=i;render()};T.append(b)});
+function names(ints){return ints.map(n=>pc[(root+n)%12])}
+function render(){
+ [...R.children].forEach((b,i)=>b.classList.toggle("on",i===root));
+ [...T.children].forEach((b,i)=>b.classList.toggle("on",i===type));
+ const d=defs[type],rn=roots[root],ns=names(d.ints),base=names([0,4,7]);
+ document.getElementById("code").textContent=rn+d.id;
+ document.getElementById("codeName").textContent=rn+d.jp+"コード";
+ document.getElementById("tones").innerHTML=ns.map(n=>`<span class="tone">${n}</span>`).join("");
+ document.getElementById("degrees").innerHTML=d.deg.map(n=>`<span class="degree">${n}</span>`).join("");
+ document.getElementById("change").innerHTML=(type===0?`<strong>基本形</strong><br>${d.change}`:`<strong>${rn} から何が変わった？</strong><br>${d.change}`);
+ document.getElementById("tip").textContent=d.tip;
+ document.getElementById("baseCode").textContent=rn;
+ document.getElementById("baseTones").textContent=base.join("・");
+ document.getElementById("afterCode").textContent=rn+d.id;
+ document.getElementById("afterTones").textContent=ns.join("・");
+}
+render();
+
+let audioCtx=null;
+function playChord(){
+ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+ if(audioCtx.state==="suspended") audioCtx.resume();
+ const d=defs[type], baseMidi=48+root; // around C3
+ const now=audioCtx.currentTime;
+ d.ints.forEach((iv,i)=>{
+   const midi=baseMidi+iv+(iv===2&&d.id==="add9"?12:0);
+   const freq=440*Math.pow(2,(midi-69)/12);
+   const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+   const filter=audioCtx.createBiquadFilter();
+   o.type="triangle"; o.frequency.setValueAtTime(freq,now+i*.035);
+   filter.type="lowpass"; filter.frequency.setValueAtTime(2200,now);
+   g.gain.setValueAtTime(0.0001,now+i*.035);
+   g.gain.exponentialRampToValueAtTime(.16,now+i*.035+.008);
+   g.gain.exponentialRampToValueAtTime(.0001,now+i*.035+1.25);
+   o.connect(filter);filter.connect(g);g.connect(audioCtx.destination);
+   o.start(now+i*.035);o.stop(now+i*.035+1.3);
+ });
+}
+document.getElementById("listenBtn").onclick=playChord;
+
+</script></body></html>
