@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ギター指板 音名ハイライト Ver.5</title>
+<style>
+*{box-sizing:border-box}
+:root{--bg:#101114;--panel:#1b1d22;--text:#f5f5f6;--muted:#9fa2a9;--wood:#8c5d37;--wood2:#704526;--accent:#ffd84d}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}
+.app{width:100%;max-width:900px;margin:auto;padding:12px 7px 20px}
+h1{font-size:19px;text-align:center;margin:3px 0 3px}
+.sub{text-align:center;color:var(--muted);font-size:11px;margin-bottom:10px}
+.controls{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;background:var(--panel);padding:7px;border-radius:11px}
+button{appearance:none;min-width:0;border:1px solid #474a52;background:#292c33;color:#fff;border-radius:8px;padding:7px 2px;font-size:11px;font-weight:750;white-space:nowrap}
+button.active{background:var(--accent);color:#111;border-color:var(--accent)}
+.clear-btn{grid-column:span 4;color:#ddd}
+.help{text-align:center;color:#858990;font-size:10px;margin:6px 0 8px}
+.board-wrap{width:100%;overflow:hidden}
+.board{width:100%;}
+.nums,.row,.markers{
+ display:grid;
+ grid-template-columns:26px repeat(13,minmax(0,1fr));
+ width:100%;
+}
+.nums{height:17px}
+.corner,.num{display:flex;align-items:center;justify-content:center;color:#aeb1b7;font-size:8px}
+.row{height:29px}
+.string-label{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1d2025;border-bottom:1px solid #33363c;font-size:9px}
+.string-label b{font-size:10px}
+.string-label small{font-size:7px;color:#9fa2a9}
+.fret{position:relative;min-width:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(var(--wood),var(--wood2));border-right:1px solid rgba(235,235,235,.7);border-bottom:1px solid rgba(20,12,7,.55)}
+.fret.zero{background:#2b2e34;border-right:3px solid #eee}
+.fret:after{content:"";position:absolute;left:0;right:0;top:50%;height:var(--thick);transform:translateY(-50%);background:linear-gradient(#e0e0e0,#7f7f7f)}
+.note{display:none;position:relative;z-index:3;width:20px;height:20px;border-radius:50%;align-items:center;justify-content:center;background:var(--accent);color:#111;border:1px solid #fff0a3;font-size:7px;font-weight:900;box-shadow:0 0 8px rgba(255,216,77,.55)}
+.fret.lit .note{display:flex}
+.fret.lit{background:linear-gradient(#a87a40,#81522a)}
+.markers{height:13px}
+.marker{display:flex;align-items:center;justify-content:center;gap:2px}
+.marker i{display:block;width:5px;height:5px;border-radius:50%;background:#bfc1c5;opacity:.8}
+.footer{text-align:center;color:#70737a;font-size:9px;margin-top:5px}
+.nojs{text-align:center;color:#ffdc73;font-size:10px;margin:6px 0}
+@media (min-width:600px){
+ .controls{grid-template-columns:repeat(7,1fr)}
+ .clear-btn{grid-column:span 2}
+ .row{height:34px}
+ .note{width:22px;height:22px;font-size:8px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<h1>🎸 ギター指板 音名ハイライト</h1>
+<div class="sub">0〜12F ｜ E A D G B E</div>
+<div class="controls"><button class="note-btn" data-pitch="0" onclick="togglePitch(0,this)">C</button><button class="note-btn" data-pitch="1" onclick="togglePitch(1,this)">C♯/D♭</button><button class="note-btn" data-pitch="2" onclick="togglePitch(2,this)">D</button><button class="note-btn" data-pitch="3" onclick="togglePitch(3,this)">D♯/E♭</button><button class="note-btn" data-pitch="4" onclick="togglePitch(4,this)">E</button><button class="note-btn" data-pitch="5" onclick="togglePitch(5,this)">F</button><button class="note-btn" data-pitch="6" onclick="togglePitch(6,this)">F♯/G♭</button><button class="note-btn" data-pitch="7" onclick="togglePitch(7,this)">G</button><button class="note-btn" data-pitch="8" onclick="togglePitch(8,this)">G♯/A♭</button><button class="note-btn" data-pitch="9" onclick="togglePitch(9,this)">A</button><button class="note-btn" data-pitch="10" onclick="togglePitch(10,this)">A♯/B♭</button><button class="note-btn" data-pitch="11" onclick="togglePitch(11,this)">B</button><button class="clear-btn" onclick="clearAll()">全解除</button></div>
+<noscript><div class="nojs">このプレビューではハイライト操作が無効です。</div></noscript>
+<div class="help">複数選択OK ／ もう一度押すと解除</div>
+<div class="board-wrap">
+ <div class="board">
+  <div class="nums"><div class="corner"></div><div class="num">0</div><div class="num">1</div><div class="num">2</div><div class="num">3</div><div class="num">4</div><div class="num">5</div><div class="num">6</div><div class="num">7</div><div class="num">8</div><div class="num">9</div><div class="num">10</div><div class="num">11</div><div class="num">12</div></div>
+  <div class="row"><div class="string-label"><b>6</b><small>E</small></div><div class="fret zero" data-pitch="4" style="--thick:3.4px"><span class="note">E</span></div><div class="fret" data-pitch="5" style="--thick:3.4px"><span class="note">F</span></div><div class="fret" data-pitch="6" style="--thick:3.4px"><span class="note">F♯</span></div><div class="fret" data-pitch="7" style="--thick:3.4px"><span class="note">G</span></div><div class="fret" data-pitch="8" style="--thick:3.4px"><span class="note">G♯</span></div><div class="fret" data-pitch="9" style="--thick:3.4px"><span class="note">A</span></div><div class="fret" data-pitch="10" style="--thick:3.4px"><span class="note">A♯</span></div><div class="fret" data-pitch="11" style="--thick:3.4px"><span class="note">B</span></div><div class="fret" data-pitch="0" style="--thick:3.4px"><span class="note">C</span></div><div class="fret" data-pitch="1" style="--thick:3.4px"><span class="note">C♯</span></div><div class="fret" data-pitch="2" style="--thick:3.4px"><span class="note">D</span></div><div class="fret" data-pitch="3" style="--thick:3.4px"><span class="note">D♯</span></div><div class="fret" data-pitch="4" style="--thick:3.4px"><span class="note">E</span></div></div><div class="row"><div class="string-label"><b>5</b><small>A</small></div><div class="fret zero" data-pitch="9" style="--thick:3.0px"><span class="note">A</span></div><div class="fret" data-pitch="10" style="--thick:3.0px"><span class="note">A♯</span></div><div class="fret" data-pitch="11" style="--thick:3.0px"><span class="note">B</span></div><div class="fret" data-pitch="0" style="--thick:3.0px"><span class="note">C</span></div><div class="fret" data-pitch="1" style="--thick:3.0px"><span class="note">C♯</span></div><div class="fret" data-pitch="2" style="--thick:3.0px"><span class="note">D</span></div><div class="fret" data-pitch="3" style="--thick:3.0px"><span class="note">D♯</span></div><div class="fret" data-pitch="4" style="--thick:3.0px"><span class="note">E</span></div><div class="fret" data-pitch="5" style="--thick:3.0px"><span class="note">F</span></div><div class="fret" data-pitch="6" style="--thick:3.0px"><span class="note">F♯</span></div><div class="fret" data-pitch="7" style="--thick:3.0px"><span class="note">G</span></div><div class="fret" data-pitch="8" style="--thick:3.0px"><span class="note">G♯</span></div><div class="fret" data-pitch="9" style="--thick:3.0px"><span class="note">A</span></div></div><div class="row"><div class="string-label"><b>4</b><small>D</small></div><div class="fret zero" data-pitch="2" style="--thick:2.6px"><span class="note">D</span></div><div class="fret" data-pitch="3" style="--thick:2.6px"><span class="note">D♯</span></div><div class="fret" data-pitch="4" style="--thick:2.6px"><span class="note">E</span></div><div class="fret" data-pitch="5" style="--thick:2.6px"><span class="note">F</span></div><div class="fret" data-pitch="6" style="--thick:2.6px"><span class="note">F♯</span></div><div class="fret" data-pitch="7" style="--thick:2.6px"><span class="note">G</span></div><div class="fret" data-pitch="8" style="--thick:2.6px"><span class="note">G♯</span></div><div class="fret" data-pitch="9" style="--thick:2.6px"><span class="note">A</span></div><div class="fret" data-pitch="10" style="--thick:2.6px"><span class="note">A♯</span></div><div class="fret" data-pitch="11" style="--thick:2.6px"><span class="note">B</span></div><div class="fret" data-pitch="0" style="--thick:2.6px"><span class="note">C</span></div><div class="fret" data-pitch="1" style="--thick:2.6px"><span class="note">C♯</span></div><div class="fret" data-pitch="2" style="--thick:2.6px"><span class="note">D</span></div></div><div class="row"><div class="string-label"><b>3</b><small>G</small></div><div class="fret zero" data-pitch="7" style="--thick:2.2px"><span class="note">G</span></div><div class="fret" data-pitch="8" style="--thick:2.2px"><span class="note">G♯</span></div><div class="fret" data-pitch="9" style="--thick:2.2px"><span class="note">A</span></div><div class="fret" data-pitch="10" style="--thick:2.2px"><span class="note">A♯</span></div><div class="fret" data-pitch="11" style="--thick:2.2px"><span class="note">B</span></div><div class="fret" data-pitch="0" style="--thick:2.2px"><span class="note">C</span></div><div class="fret" data-pitch="1" style="--thick:2.2px"><span class="note">C♯</span></div><div class="fret" data-pitch="2" style="--thick:2.2px"><span class="note">D</span></div><div class="fret" data-pitch="3" style="--thick:2.2px"><span class="note">D♯</span></div><div class="fret" data-pitch="4" style="--thick:2.2px"><span class="note">E</span></div><div class="fret" data-pitch="5" style="--thick:2.2px"><span class="note">F</span></div><div class="fret" data-pitch="6" style="--thick:2.2px"><span class="note">F♯</span></div><div class="fret" data-pitch="7" style="--thick:2.2px"><span class="note">G</span></div></div><div class="row"><div class="string-label"><b>2</b><small>B</small></div><div class="fret zero" data-pitch="11" style="--thick:1.8px"><span class="note">B</span></div><div class="fret" data-pitch="0" style="--thick:1.8px"><span class="note">C</span></div><div class="fret" data-pitch="1" style="--thick:1.8px"><span class="note">C♯</span></div><div class="fret" data-pitch="2" style="--thick:1.8px"><span class="note">D</span></div><div class="fret" data-pitch="3" style="--thick:1.8px"><span class="note">D♯</span></div><div class="fret" data-pitch="4" style="--thick:1.8px"><span class="note">E</span></div><div class="fret" data-pitch="5" style="--thick:1.8px"><span class="note">F</span></div><div class="fret" data-pitch="6" style="--thick:1.8px"><span class="note">F♯</span></div><div class="fret" data-pitch="7" style="--thick:1.8px"><span class="note">G</span></div><div class="fret" data-pitch="8" style="--thick:1.8px"><span class="note">G♯</span></div><div class="fret" data-pitch="9" style="--thick:1.8px"><span class="note">A</span></div><div class="fret" data-pitch="10" style="--thick:1.8px"><span class="note">A♯</span></div><div class="fret" data-pitch="11" style="--thick:1.8px"><span class="note">B</span></div></div><div class="row"><div class="string-label"><b>1</b><small>E</small></div><div class="fret zero" data-pitch="4" style="--thick:1.4px"><span class="note">E</span></div><div class="fret" data-pitch="5" style="--thick:1.4px"><span class="note">F</span></div><div class="fret" data-pitch="6" style="--thick:1.4px"><span class="note">F♯</span></div><div class="fret" data-pitch="7" style="--thick:1.4px"><span class="note">G</span></div><div class="fret" data-pitch="8" style="--thick:1.4px"><span class="note">G♯</span></div><div class="fret" data-pitch="9" style="--thick:1.4px"><span class="note">A</span></div><div class="fret" data-pitch="10" style="--thick:1.4px"><span class="note">A♯</span></div><div class="fret" data-pitch="11" style="--thick:1.4px"><span class="note">B</span></div><div class="fret" data-pitch="0" style="--thick:1.4px"><span class="note">C</span></div><div class="fret" data-pitch="1" style="--thick:1.4px"><span class="note">C♯</span></div><div class="fret" data-pitch="2" style="--thick:1.4px"><span class="note">D</span></div><div class="fret" data-pitch="3" style="--thick:1.4px"><span class="note">D♯</span></div><div class="fret" data-pitch="4" style="--thick:1.4px"><span class="note">E</span></div></div>
+  <div class="markers"><div></div><div></div><div></div><div></div><div class="marker"><i></i></div><div></div><div class="marker"><i></i></div><div></div><div class="marker"><i></i></div><div></div><div class="marker"><i></i></div><div></div><div></div><div class="marker"><i></i><i></i></div></div>
+ </div>
+</div>
+<div class="footer">3・5・7・9F ●　12F ●●</div>
+</div>
+<script>
+const selected=new Set();
+function togglePitch(p,b){
+ if(selected.has(p)){selected.delete(p);b.classList.remove("active");}
+ else{selected.add(p);b.classList.add("active");}
+ paint();
+}
+function clearAll(){
+ selected.clear();
+ document.querySelectorAll(".note-btn").forEach(b=>b.classList.remove("active"));
+ paint();
+}
+function paint(){
+ document.querySelectorAll(".fret[data-pitch]").forEach(c=>c.classList.toggle("lit",selected.has(Number(c.dataset.pitch))));
+}
+</script>
+</body>
+</html>
