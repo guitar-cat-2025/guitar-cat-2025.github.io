@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>音符の長さ｜Level 1</title>
+<style>
+:root{
+  --bg:#0d1015; --panel:#151a22; --panel2:#10151c; --line:#2a3340;
+  --text:#f5f7fa; --muted:#98a3b3; --accent:#7ee2a8; --accent2:#b7ffd2;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; min-height:100svh; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
+}
+.app{width:min(720px,100%); margin:auto; padding:14px 14px 24px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.brand{font-size:11px;letter-spacing:.16em;color:var(--muted)}
+.back{color:var(--muted);text-decoration:none;font-size:13px;padding:7px 10px;border:1px solid var(--line);border-radius:10px}
+.hero{text-align:center;margin:8px 0 12px}
+.level{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--accent);border:1px solid #315b43;border-radius:999px;padding:5px 9px}
+h1{font-size:24px;margin:9px 0 4px}
+.sub{font-size:13px;color:var(--muted);margin:0}
+.metronome{
+  margin:12px 0; padding:12px; border:1px solid var(--line); border-radius:18px;
+  background:linear-gradient(180deg,var(--panel),var(--panel2));
+}
+.metro-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.metro-title{font-size:13px;font-weight:800}
+.bpm{font-size:12px;color:var(--muted)}
+.beats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.beat{height:12px;border-radius:999px;background:#29313c;transition:.08s transform,.08s background,.08s box-shadow}
+.beat.on{background:var(--accent);transform:scaleY(1.45);box-shadow:0 0 14px rgba(126,226,168,.45)}
+.start{
+  width:100%; margin-top:11px; border:0; border-radius:13px; padding:12px;
+  font-size:15px;font-weight:900;background:var(--accent);color:#07130c;cursor:pointer
+}
+.start.running{background:#26322c;color:var(--accent2);border:1px solid #365344}
+.help{text-align:center;font-size:11px;color:var(--muted);margin-top:7px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.card{
+  border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,#171d26,#11161d);
+  padding:12px 8px;text-align:center;cursor:pointer;min-height:151px;transition:.15s transform,.15s border-color
+}
+.card:active{transform:scale(.98)}
+.card.active{border-color:var(--accent)}
+.note{
+  height:59px;display:flex;align-items:center;justify-content:center;
+  font-size:58px;line-height:1
+}
+.note-shape{position:relative;display:inline-block;width:42px;height:58px}
+.note-head{position:absolute;width:31px;height:21px;border:4px solid currentColor;border-radius:50%;left:3px;bottom:7px;transform:rotate(-10deg)}
+.note-shape.half .stem,.note-shape.quarter .stem{position:absolute;width:4px;height:47px;background:currentColor;right:5px;bottom:17px;border-radius:3px}
+.note-shape.quarter .note-head{background:currentColor}
+.note-shape.whole{width:44px;height:42px}
+.note-shape.whole .note-head{width:36px;height:23px;left:4px;bottom:8px}
+}
+.name{font-size:14px;font-weight:900;margin-top:3px}
+.length{font-size:13px;color:var(--accent);font-weight:800;margin-top:4px}
+.desc{font-size:10px;color:var(--muted);margin-top:5px}
+.demo{
+  margin-top:11px;border:1px solid var(--line);border-radius:18px;padding:13px;
+  background:#11161d;display:none
+}
+.demo.show{display:block}
+.demo-top{display:flex;justify-content:space-between;align-items:end;gap:10px}
+.demo-name{font-size:17px;font-weight:900}
+.demo-copy{font-size:12px;color:var(--muted);margin-top:2px}
+.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:12px}
+.cell{position:relative;height:37px;border-radius:9px;background:#202732;overflow:hidden}
+.cell span{position:absolute;left:7px;top:6px;font-size:10px;color:#8d98a8;z-index:2}
+.fill{position:absolute;inset:0;background:rgba(126,226,168,.16);transform:scaleX(0);transform-origin:left}
+.cell.play .fill{animation:fill .75s linear forwards}
+@keyframes fill{to{transform:scaleX(1)}}
+.legend{text-align:center;color:var(--muted);font-size:10px;margin-top:8px}
+@media(max-width:420px){
+  .app{padding:11px 10px 18px} h1{font-size:21px}
+  .cards{gap:6px}.card{padding:10px 5px;min-height:142px}
+  .note{font-size:51px;height:54px}.name{font-size:12px}.length{font-size:12px}
+}
+</style>
+</head>
+<body>
+<main class="app">
+  <div class="top">
+    <div class="brand">GUITAR TOOLS / BEGINNER</div>
+    <a class="back" href="index.html">← ツール一覧</a>
+  </div>
+
+  <section class="hero">
+    <span class="level">LEVEL 1 / 基本の音符</span>
+    <h1>音符の長さを覚えよう</h1>
+    <p class="sub">まずは「4拍・2拍・1拍」の3つだけ。</p>
+  </section>
+
+  <section class="metronome">
+    <div class="metro-head">
+      <div class="metro-title">METRONOME</div>
+      <div class="bpm">♩ = 80 BPM</div>
+    </div>
+    <div class="beats">
+      <div class="beat"></div><div class="beat"></div><div class="beat"></div><div class="beat"></div>
+    </div>
+    <button id="start" class="start">START</button>
+    <div class="help">STARTを押すと、4拍のメトロノームが鳴り続けます</div>
+  </section>
+
+  <section class="cards">
+    <div class="card" data-kind="whole" data-name="全音符" data-beats="4">
+      <div class="note"><span class="note-shape whole"><span class="note-head"></span></span></div><div class="name">全音符</div><div class="length">4拍</div>
+      <div class="desc">1・2・3・4</div>
+    </div>
+    <div class="card" data-kind="half" data-name="2分音符" data-beats="2">
+      <div class="note"><span class="note-shape half"><span class="note-head"></span><span class="stem"></span></span></div><div class="name">2分音符</div><div class="length">2拍</div>
+      <div class="desc">1・2</div>
+    </div>
+    <div class="card" data-kind="quarter" data-name="4分音符" data-beats="1">
+      <div class="note"><span class="note-shape quarter"><span class="note-head"></span><span class="stem"></span></span></div><div class="name">4分音符</div><div class="length">1拍</div>
+      <div class="desc">1</div>
+    </div>
+  </section>
+
+  <section id="demo" class="demo">
+    <div class="demo-top">
+      <div>
+        <div id="demoName" class="demo-name"></div>
+        <div id="demoCopy" class="demo-copy"></div>
+      </div>
+      <div id="demoNote" class="note" style="height:auto;font-size:45px"></div>
+    </div>
+    <div id="timeline" class="timeline"></div>
+    <div class="legend">メトロノームに合わせて、音が続く長さを見てみよう</div>
+  </section>
+</main>
+
+<script>
+const beatEls=[...document.querySelectorAll('.beat')];
+const startBtn=document.getElementById('start');
+const cards=[...document.querySelectorAll('.card')];
+const demo=document.getElementById('demo');
+const timeline=document.getElementById('timeline');
+const demoName=document.getElementById('demoName');
+const demoCopy=document.getElementById('demoCopy');
+const demoNote=document.getElementById('demoNote');
+
+let ctx=null, timer=null, running=false, beat=0, nextTime=0;
+let selectedBeats=0, selectedName='', selectedSymbol='';
+const interval=0.75; // 80 BPM
+
+function clickSound(time, strong=false){
+  const osc=ctx.createOscillator(), gain=ctx.createGain();
+  osc.type='sine'; osc.frequency.value=strong?1050:760;
+  gain.gain.setValueAtTime(0.0001,time);
+  gain.gain.exponentialRampToValueAtTime(strong?0.24:0.15,time+0.004);
+  gain.gain.exponentialRampToValueAtTime(0.0001,time+0.055);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(time); osc.stop(time+0.065);
+}
+function schedule(){
+  while(nextTime < ctx.currentTime + .12){
+    const b=beat;
+    clickSound(nextTime,b===0);
+    const delay=Math.max(0,(nextTime-ctx.currentTime)*1000);
+    setTimeout(()=>visualBeat(b),delay);
+    beat=(beat+1)%4;
+    nextTime+=interval;
+  }
+}
+function visualBeat(b){
+  beatEls.forEach((el,i)=>el.classList.toggle('on',i===b));
+  if(selectedBeats && b===0) animateTimeline();
+}
+async function startMetro(){
+  if(!ctx) ctx=new (window.AudioContext||window.webkitAudioContext)();
+  await ctx.resume();
+  running=true; beat=0; nextTime=ctx.currentTime+.06;
+  timer=setInterval(schedule,25); schedule();
+  startBtn.textContent='METRONOME ON';
+  startBtn.classList.add('running');
+}
+startBtn.addEventListener('click',()=>{
+  if(!running) startMetro();
+});
+
+function buildTimeline(beats){
+  timeline.innerHTML='';
+  for(let i=0;i<4;i++){
+    const cell=document.createElement('div'); cell.className='cell';
+    cell.innerHTML=`<span>${i+1}</span><div class="fill"></div>`;
+    timeline.appendChild(cell);
+  }
+  selectedBeats=beats;
+}
+function animateTimeline(){
+  const cells=[...timeline.children];
+  cells.forEach(c=>c.classList.remove('play'));
+  void timeline.offsetWidth;
+  if(selectedBeats===4){
+    cells.forEach((c,i)=>setTimeout(()=>c.classList.add('play'),i*750));
+  }else if(selectedBeats===2){
+    cells.forEach((c,i)=>setTimeout(()=>c.classList.add('play'),i*750));
+  }else{
+    cells.forEach((c,i)=>setTimeout(()=>c.classList.add('play'),i*750));
+  }
+}
+cards.forEach(card=>card.addEventListener('click',async()=>{
+  cards.forEach(c=>c.classList.remove('active')); card.classList.add('active');
+  selectedBeats=Number(card.dataset.beats);
+  selectedName=card.dataset.name;
+  selectedSymbol=card.dataset.kind;
+  demoName.textContent=`${selectedName} = ${selectedBeats}拍`;
+  demoCopy.textContent=selectedBeats===4?'4拍ぶん、音を伸ばします。':
+                       selectedBeats===2?'2拍ぶん、音を伸ばします。':'1拍ぶんの長さです。';
+  demoNote.innerHTML = selectedSymbol==='whole'
+    ? '<span class="note-shape whole"><span class="note-head"></span></span>'
+    : selectedSymbol==='half'
+      ? '<span class="note-shape half"><span class="note-head"></span><span class="stem"></span></span>'
+      : '<span class="note-shape quarter"><span class="note-head"></span><span class="stem"></span></span>';
+  buildTimeline(selectedBeats);
+  demo.classList.add('show');
+  if(!running) await startMetro();
+}));
+</script>
+</body>
+</html>
