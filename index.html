@@ -14,4 +14,89 @@
   color:#d9dee5;text-decoration:none;
   font-size:17px;line-height:1;
 }
-</style></head><body><main class="wrap"><section class="hero"><div class="hero-top"><div class="badge">🎸 BEGINNER GUITAR TOOLS</div><a class="x-link" href="https://x.com/2025_____2025" target="_blank" rel="noopener noreferrer" aria-label="X @2025_____2025">𝕏</a></div><h1>ギター初心者用ツール</h1><p class="lead">指板・音名・音楽理論を、触りながら少しずつ覚えるためのツール集。</p></section><div class="section-title">TOOLS</div><section class="grid"><a class="card available" href="fretboard.html"><span class="status">✓ 使用可能</span><div class="icon">🎸</div><div class="name">指板・スケール・コード</div><p class="desc">音の位置、度数、音程、スケール、コード構成音を指板上で確認。</p><span class="arrow">›</span></a><a class="card available" href="note-trainer.html"><span class="status">✓ 使用可能</span><div class="icon">🎵</div><div class="name">音名変換トレーニング</div><p class="desc">C D E F G A B とドレミの対応を、1音・5音モードでトレーニング。</p><span class="arrow">›</span></a></section><div class="footer">Guitar Beginner Tools</div></main></body></html>
+
+/* Mobile typography / wrapping refinements */
+.hero h1{
+  font-size:clamp(25px,7vw,31px);
+  line-height:1.25;
+  letter-spacing:.01em;
+  white-space:nowrap;
+}
+.lead{
+  font-size:12px;
+  line-height:1.8;
+  max-width:34em;
+}
+.card .name{
+  font-size:15px;
+  line-height:1.45;
+  letter-spacing:0;
+  word-break:keep-all;
+  overflow-wrap:normal;
+}
+.card .desc{
+  font-size:10.5px;
+  line-height:1.7;
+  word-break:normal;
+  overflow-wrap:anywhere;
+}
+@media(max-width:390px){
+  .hero h1{font-size:25px}
+  .card{padding:14px 12px}
+  .card .name{font-size:14px;line-height:1.4}
+  .card .desc{font-size:10px;line-height:1.65}
+}
+
+/* Refined 2-column centered tool cards */
+.grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;
+}
+.card{
+  min-width:0;
+  align-items:center!important;
+  text-align:center!important;
+  padding:18px 10px 16px!important;
+}
+.card .icon{
+  margin:4px auto 16px!important;
+  width:58px;height:58px;
+  flex:0 0 auto;
+}
+.card .name{
+  width:100%;
+  font-size:14px!important;
+  line-height:1.45!important;
+  text-align:center!important;
+  word-break:keep-all!important;
+}
+.card .desc{
+  width:100%;
+  margin-top:8px!important;
+  text-align:center!important;
+  font-size:9.5px!important;
+  line-height:1.65!important;
+}
+.card .arrow{right:10px!important;bottom:10px!important}
+.hero{margin-bottom:30px}
+.hero h1{margin-bottom:0!important}
+@media(max-width:390px){
+  .grid{gap:8px!important}
+  .card{padding-left:8px!important;padding-right:8px!important}
+  .card .name{font-size:13px!important}
+  .card .desc{font-size:9px!important}
+}
+
+.card .desc{
+  word-break:keep-all!important;
+  overflow-wrap:normal!important;
+  line-height:1.7!important;
+}
+.footer{
+  font-size:10px!important;
+  font-weight:700!important;
+  letter-spacing:.08em!important;
+  text-transform:uppercase;
+}
+</style></head><body><main class="wrap"><section class="hero"><div class="hero-top"><div class="badge">🎸 BEGINNER GUITAR TOOLS</div><a class="x-link" href="https://x.com/2025_____2025" target="_blank" rel="noopener noreferrer" aria-label="X @2025_____2025">𝕏</a></div></section><div class="section-title">TOOLS</div><section class="grid"><a class="card available" href="fretboard.html"><div class="icon">🎸</div><div class="name">指板・スケール・コード</div><p class="desc">音の位置・度数・音程を確認。<br>スケール・コード構成音も指板上で確認。</p><span class="arrow">›</span></a><a class="card available" href="note-trainer.html"><div class="icon">🎵</div><div class="name">音名変換トレーニング</div><p class="desc">C D E F G A B とドレミを変換。<br>1音・5音モードでトレーニング。</p><span class="arrow">›</span></a></section><div class="footer">BEGINNER GUITAR TOOLS</div></main></body></html>
