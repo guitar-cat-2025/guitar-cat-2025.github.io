@@ -223,13 +223,10 @@ function answer(value){
      m.className="message";
      m.innerHTML="";
      const box=document.createElement("div"); box.className="compare";
-     const t1=document.createElement("div"); t1.className="compareTitle"; t1.textContent="YOUR ANSWER";
-     const r1=document.createElement("div"); r1.className="compareRow";
-     entered.forEach((v,i)=>{const c=document.createElement("div");c.className="compareCell "+(groupMistakes[i]?"bad":"good");c.textContent=v;r1.appendChild(c)});
      const t2=document.createElement("div"); t2.className="compareTitle"; t2.textContent="CORRECT";
      const r2=document.createElement("div"); r2.className="compareRow";
      current.map(target).forEach(v=>{const c=document.createElement("div");c.className="compareCell";c.textContent=v;r2.appendChild(c)});
-     box.append(t1,r1,t2,r2); m.appendChild(box);
+     box.append(t2,r2); m.appendChild(box);
    }
 
    updateStats();
