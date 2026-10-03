@@ -81,6 +81,27 @@ h1{font-size:22px;margin:7px 0 28px;font-weight:700}
 
 .back{display:block;width:max-content;margin:0 0 18px;text-decoration:none;color:#8e8e93;font-size:12px;font-weight:700;padding:8px 10px;border:1px solid #2b2b31;border-radius:11px;background:#151518}
 .back:active{background:#202024}
+
+/* Stable feedback overlay: result display never changes layout */
+.card{position:relative}
+.card.fiveMode{padding-bottom:22px}
+.card.fiveMode .message{
+  position:absolute !important;
+  left:12px !important;
+  right:12px !important;
+  bottom:20px !important;
+  height:68px !important;
+  min-height:68px !important;
+  margin:0 !important;
+  z-index:3;
+  pointer-events:none;
+  display:block !important;
+}
+.card.fiveMode .answers{
+  margin-top:78px !important;
+}
+.card.fiveMode .compare{margin:0 !important;width:100%}
+
 </style>
 </head>
 <body>
