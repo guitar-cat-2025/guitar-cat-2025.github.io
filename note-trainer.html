@@ -88,7 +88,7 @@ h1{font-size:22px;margin:7px 0 28px;font-weight:700}
 
 <h1>音名変換トレーニング</h1>
 
-<section class="card">
+<section class="card" id="trainerCard">
   <div id="question"></div>
   <div id="message" class="message"></div>
   <div id="answers" class="answers"></div>
@@ -157,6 +157,7 @@ function makeQuestion(){
 }
 
 function renderQuestion(){
+ document.getElementById("trainerCard").classList.toggle("fiveMode",count===5);
  q.innerHTML="";
  if(count===1){
    const el=document.createElement("div");
