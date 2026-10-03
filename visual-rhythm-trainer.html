@@ -1,77 +1,713 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Visual Rhythm Trainer</title>
+
 <style>
-:root{--bg:#0b1020;--panel:#151d34;--text:#f5f7ff;--muted:#9ca9c8;--accent:#78e6c8;--line:#33405f}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 10%,#182342,#0b1020 55%);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;min-height:100vh}
-main{max-width:760px;margin:auto;padding:18px}.top{text-align:center}.top h1{margin:6px 0;font-size:clamp(24px,6vw,38px)}.top p{margin:0;color:var(--muted)}
-.card{margin-top:16px;background:#11192dbf;border:1px solid #273451;border-radius:22px;padding:16px;box-shadow:0 18px 50px #0005}
-.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
-button{border:1px solid #344260;background:#1a2540;color:white;border-radius:14px;padding:11px 15px;font-weight:700;font-size:15px}
-button.active{background:var(--accent);color:#07120f;border-color:var(--accent)}
-button#start{min-width:110px;background:#fff;color:#101525}.bpm{display:flex;align-items:center;gap:8px}.bpm input{width:150px}.bpm strong{min-width:62px}
-.stage{position:relative;height:340px;overflow:hidden;border-radius:18px;background:linear-gradient(#101a31,#0d1425);margin-top:14px}
-.beatdots{position:absolute;left:0;right:0;top:18px;display:flex;justify-content:center;gap:13px}.beatdot{width:12px;height:12px;border-radius:50%;background:#394561}.beatdot.on{background:var(--accent);box-shadow:0 0 18px var(--accent)}
-.ball{position:absolute;width:52px;height:52px;border-radius:50%;left:calc(50% - 26px);top:42px;background:radial-gradient(circle at 35% 30%,#fff,var(--accent) 24%,#30a991 75%);box-shadow:0 10px 30px #78e6c855}
-.floor{position:absolute;left:9%;right:9%;bottom:64px;height:3px;background:#60708f;border-radius:3px}.floor.hit{box-shadow:0 0 22px var(--accent);background:var(--accent)}
-.count{position:absolute;bottom:17px;left:0;right:0;text-align:center;font-size:22px;font-weight:900;letter-spacing:.08em}.sub{color:var(--accent)}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.grid button{padding:12px 5px}.hint{text-align:center;color:var(--muted);font-size:13px;margin:12px 0 0}
-@media(max-width:520px){.stage{height:300px}.grid{grid-template-columns:repeat(2,1fr)}}
-</style></head>
-<body><main>
-<div class="top"><h1>Visual Rhythm Trainer</h1><p>音と動きで「1拍の分割」を感じよう</p></div>
+:root{
+  --bg:#0b1020;
+  --text:#f5f7ff;
+  --muted:#9ca9c8;
+  --accent:#78e6c8;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:radial-gradient(circle at 50% 10%,#182342,#0b1020 55%);
+  color:var(--text);
+  font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;
+}
+
+main{
+  max-width:760px;
+  margin:auto;
+  padding:18px;
+}
+
+.top{text-align:center}
+
+.top h1{
+  margin:6px 0;
+  font-size:clamp(24px,6vw,38px);
+}
+
+.top p{
+  margin:0;
+  color:var(--muted);
+}
+
+.card{
+  margin-top:16px;
+  padding:16px;
+  background:#11192dbf;
+  border:1px solid #273451;
+  border-radius:22px;
+  box-shadow:0 18px 50px #0005;
+}
+
+.controls{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:center;
+}
+
+button{
+  border:1px solid #344260;
+  background:#1a2540;
+  color:white;
+  border-radius:14px;
+  padding:11px 15px;
+  font-weight:700;
+  font-size:15px;
+}
+
+button.active{
+  background:var(--accent);
+  color:#07120f;
+  border-color:var(--accent);
+}
+
+button#start{
+  min-width:110px;
+  background:#fff;
+  color:#101525;
+}
+
+.bpm{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.bpm input{width:150px}
+.bpm strong{min-width:62px}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-top:12px;
+}
+
+.grid button{
+  padding:12px 5px;
+}
+
+.stage{
+  position:relative;
+  height:340px;
+  overflow:hidden;
+  border-radius:18px;
+  background:linear-gradient(#101a31,#0d1425);
+  margin-top:14px;
+}
+
+.beatdots{
+  position:absolute;
+  left:0;
+  right:0;
+  top:18px;
+  display:flex;
+  justify-content:center;
+  gap:13px;
+}
+
+.beatdot{
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  background:#394561;
+}
+
+.beatdot.on{
+  background:var(--accent);
+  box-shadow:0 0 18px var(--accent);
+}
+
+.ball{
+  position:absolute;
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  left:calc(50% - 26px);
+
+  /* 重要：固定位置をやめる */
+  top:0;
+
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      #fff,
+      var(--accent) 24%,
+      #30a991 75%
+    );
+
+  box-shadow:0 10px 30px #78e6c855;
+}
+
+.floor{
+  position:absolute;
+  left:9%;
+  right:9%;
+  bottom:64px;
+  height:3px;
+  background:#60708f;
+  border-radius:3px;
+}
+
+.floor.hit{
+  background:var(--accent);
+  box-shadow:0 0 22px var(--accent);
+}
+
+.count{
+  position:absolute;
+  bottom:17px;
+  left:0;
+  right:0;
+  text-align:center;
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+
+.sub{
+  color:var(--accent);
+}
+
+.hint{
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+  margin:12px 0 0;
+}
+
+@media(max-width:520px){
+  .stage{height:300px}
+
+  .grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main>
+
+<div class="top">
+  <h1>Visual Rhythm Trainer</h1>
+  <p>音と動きで「1拍の分割」を感じよう</p>
+</div>
+
 <div class="card">
- <div class="controls">
-  <button id="start">▶ START</button>
-  <div class="bpm"><span>BPM</span><input id="bpm" type="range" min="40" max="160" value="80"><strong id="bpmv">80</strong></div>
- </div>
- <div class="grid">
-  <button class="mode active" data-div="1">♩ 4分</button>
-  <button class="mode" data-div="2">♫ 8分</button>
-  <button class="mode" data-div="3">③ 3連</button>
-  <button class="mode" data-div="4">♬ 16分</button>
- </div>
- <div class="stage">
-  <div class="beatdots"><i class="beatdot"></i><i class="beatdot"></i><i class="beatdot"></i><i class="beatdot"></i></div>
-  <div class="ball"></div><div class="floor"></div><div class="count"><span id="beat">1</span> <span class="sub" id="sub">●</span></div>
- </div>
- <p class="hint">ボールが床に着く瞬間が音の位置。4分 → 8分 → 3連 → 16分を切り替えて比べてみよう。</p>
-</div></main>
+
+  <div class="controls">
+
+    <button id="start">▶ START</button>
+
+    <div class="bpm">
+      <span>BPM</span>
+      <input id="bpm" type="range" min="40" max="160" value="80">
+      <strong id="bpmv">80</strong>
+    </div>
+
+  </div>
+
+  <div class="grid">
+
+    <button class="mode active" data-div="1">
+      ♩ 4分
+    </button>
+
+    <button class="mode" data-div="2">
+      ♫ 8分
+    </button>
+
+    <button class="mode" data-div="3">
+      ③ 3連
+    </button>
+
+    <button class="mode" data-div="4">
+      ♬ 16分
+    </button>
+
+  </div>
+
+  <div class="stage">
+
+    <div class="beatdots">
+      <i class="beatdot"></i>
+      <i class="beatdot"></i>
+      <i class="beatdot"></i>
+      <i class="beatdot"></i>
+    </div>
+
+    <div class="ball"></div>
+
+    <div class="floor"></div>
+
+    <div class="count">
+      <span id="beat">1</span>
+      <span class="sub" id="sub">●</span>
+    </div>
+
+  </div>
+
+  <p class="hint">
+    ボールが床に着く瞬間が音の位置。
+    4分 → 8分 → 3連 → 16分を切り替えて比べてみよう。
+  </p>
+
+</div>
+
+</main>
+
 <script>
-const start=document.querySelector('#start'), slider=document.querySelector('#bpm'), bpmv=document.querySelector('#bpmv');
-const ball=document.querySelector('.ball'), floor=document.querySelector('.floor'), beatEl=document.querySelector('#beat'), subEl=document.querySelector('#sub');
-const dots=[...document.querySelectorAll('.beatdot')], modes=[...document.querySelectorAll('.mode')];
-let playing=false, div=1, bpm=80, t0=0, raf=0, audio=null, lastStep=-1;
-const labels={1:['●'],2:['1','&'],3:['1','trip','let'],4:['1','e','&','a']};
-function click(accent){
- if(!audio) audio=new (window.AudioContext||window.webkitAudioContext)();
- const o=audio.createOscillator(), g=audio.createGain(), now=audio.currentTime;
- o.frequency.value=accent?1050:720; g.gain.setValueAtTime(accent?.11:.07,now); g.gain.exponentialRampToValueAtTime(.0001,now+.045);
- o.connect(g).connect(audio.destination);o.start(now);o.stop(now+.05);
-}
-function frame(now){
- if(!playing)return;
- const beatMs=60000/bpm, subMs=beatMs/div, elapsed=now-t0;
- const step=Math.floor(elapsed/subMs), phase=(elapsed%subMs)/subMs, beat=Math.floor(step/div)%4;
- // Each subdivision is a full bounce: ground at its start/end, apex halfway.
- const y=Math.sin(Math.PI*phase); const ground=224, height=145;
- ball.style.transform=`translateY(${ground-height*y}px)`;
- beatEl.textContent=beat+1; subEl.textContent=labels[div][step%div];
- dots.forEach((d,i)=>d.classList.toggle('on',i===beat));
- if(step!==lastStep){
-   lastStep=step; click(step%div===0);
-   floor.classList.add('hit'); setTimeout(()=>floor.classList.remove('hit'),55);
- }
- raf=requestAnimationFrame(frame);
-}
-start.onclick=async()=>{
- playing=!playing;
- if(playing){if(!audio)audio=new (window.AudioContext||window.webkitAudioContext)(); await audio.resume();t0=performance.now();lastStep=-1;start.textContent='■ STOP';raf=requestAnimationFrame(frame)}
- else{cancelAnimationFrame(raf);start.textContent='▶ START';ball.style.transform='translateY(224px)'}
+
+const start =
+  document.querySelector('#start');
+
+const slider =
+  document.querySelector('#bpm');
+
+const bpmv =
+  document.querySelector('#bpmv');
+
+const ball =
+  document.querySelector('.ball');
+
+const floor =
+  document.querySelector('.floor');
+
+const beatEl =
+  document.querySelector('#beat');
+
+const subEl =
+  document.querySelector('#sub');
+
+const dots =
+  [...document.querySelectorAll('.beatdot')];
+
+const modes =
+  [...document.querySelectorAll('.mode')];
+
+
+let playing = false;
+
+let div = 1;
+
+let bpm = 80;
+
+let t0 = 0;
+
+let raf = 0;
+
+let audio = null;
+
+let lastStep = -1;
+
+
+const labels = {
+
+  1:['●'],
+
+  2:['1','&'],
+
+  3:['1','trip','let'],
+
+  4:['1','e','&','a']
+
 };
-slider.oninput=()=>{bpm=+slider.value;bpmv.textContent=bpm;if(playing){t0=performance.now();lastStep=-1}};
-modes.forEach(b=>b.onclick=()=>{div=+b.dataset.div;modes.forEach(x=>x.classList.toggle('active',x===b));if(playing){t0=performance.now();lastStep=-1}});
-ball.style.transform='translateY(224px)';
-</script></body></html>
+
+
+/* -------------------------
+   メトロノーム音
+------------------------- */
+
+function click(accent){
+
+  if(!audio){
+
+    audio =
+      new (
+        window.AudioContext ||
+        window.webkitAudioContext
+      )();
+
+  }
+
+  const o =
+    audio.createOscillator();
+
+  const g =
+    audio.createGain();
+
+  const now =
+    audio.currentTime;
+
+
+  o.frequency.value =
+    accent ? 1050 : 720;
+
+
+  g.gain.setValueAtTime(
+    accent ? .11 : .07,
+    now
+  );
+
+
+  g.gain.exponentialRampToValueAtTime(
+    .0001,
+    now + .045
+  );
+
+
+  o.connect(g)
+   .connect(audio.destination);
+
+
+  o.start(now);
+
+  o.stop(now + .05);
+
+}
+
+
+/* -------------------------
+   床の実際の高さを取得
+
+   画面サイズに合わせて
+   自動で位置を計算
+------------------------- */
+
+function groundY(){
+
+  return (
+    floor.offsetTop
+    -
+    ball.offsetHeight
+  );
+
+}
+
+
+/* -------------------------
+   ボールを床へ置く
+------------------------- */
+
+function placeBall(){
+
+  ball.style.transform =
+    `translateY(${groundY()}px)`;
+
+}
+
+
+/* -------------------------
+   アニメーション
+------------------------- */
+
+function frame(now){
+
+  if(!playing) return;
+
+
+  const beatMs =
+    60000 / bpm;
+
+
+  const subMs =
+    beatMs / div;
+
+
+  const elapsed =
+    now - t0;
+
+
+  const step =
+    Math.floor(
+      elapsed / subMs
+    );
+
+
+  const phase =
+    (
+      elapsed % subMs
+    ) / subMs;
+
+
+  const beat =
+    Math.floor(
+      step / div
+    ) % 4;
+
+
+  /*
+
+     0 → 床
+     0.5 → 頂点
+     1 → 床
+
+  */
+
+  const bounce =
+    Math.sin(
+      Math.PI * phase
+    );
+
+
+  const ground =
+    groundY();
+
+
+  const height =
+    Math.min(
+      145,
+      Math.max(
+        70,
+        ground - 55
+      )
+    );
+
+
+  const y =
+    ground
+    -
+    height * bounce;
+
+
+  ball.style.transform =
+    `translateY(${y}px)`;
+
+
+  beatEl.textContent =
+    beat + 1;
+
+
+  subEl.textContent =
+    labels[div][step % div];
+
+
+  dots.forEach(
+    (d,i) => {
+
+      d.classList.toggle(
+        'on',
+        i === beat
+      );
+
+    }
+  );
+
+
+  if(step !== lastStep){
+
+    lastStep = step;
+
+
+    click(
+      step % div === 0
+    );
+
+
+    floor.classList.add(
+      'hit'
+    );
+
+
+    setTimeout(
+      () =>
+        floor.classList.remove(
+          'hit'
+        ),
+      55
+    );
+
+  }
+
+
+  raf =
+    requestAnimationFrame(
+      frame
+    );
+
+}
+
+
+/* -------------------------
+   START / STOP
+------------------------- */
+
+start.onclick =
+async () => {
+
+  playing =
+    !playing;
+
+
+  if(playing){
+
+    if(!audio){
+
+      audio =
+        new (
+          window.AudioContext ||
+          window.webkitAudioContext
+        )();
+
+    }
+
+
+    await audio.resume();
+
+
+    t0 =
+      performance.now();
+
+
+    lastStep =
+      -1;
+
+
+    start.textContent =
+      '■ STOP';
+
+
+    raf =
+      requestAnimationFrame(
+        frame
+      );
+
+  }
+
+  else{
+
+    cancelAnimationFrame(
+      raf
+    );
+
+
+    start.textContent =
+      '▶ START';
+
+
+    placeBall();
+
+  }
+
+};
+
+
+/* -------------------------
+   BPM
+------------------------- */
+
+slider.oninput =
+() => {
+
+  bpm =
+    +slider.value;
+
+
+  bpmv.textContent =
+    bpm;
+
+
+  if(playing){
+
+    t0 =
+      performance.now();
+
+
+    lastStep =
+      -1;
+
+  }
+
+};
+
+
+/* -------------------------
+   音符切替
+------------------------- */
+
+modes.forEach(
+
+  button => {
+
+    button.onclick =
+    () => {
+
+      div =
+        +button.dataset.div;
+
+
+      modes.forEach(
+
+        b =>
+          b.classList.toggle(
+            'active',
+            b === button
+          )
+
+      );
+
+
+      if(playing){
+
+        t0 =
+          performance.now();
+
+
+        lastStep =
+          -1;
+
+      }
+
+    };
+
+  }
+
+);
+
+
+/* -------------------------
+   画面サイズ変更対応
+------------------------- */
+
+window.addEventListener(
+
+  'resize',
+
+  () => {
+
+    if(!playing){
+
+      placeBall();
+
+    }
+
+  }
+
+);
+
+
+/* 初期位置 */
+
+requestAnimationFrame(
+  placeBall
+);
+
+</script>
+
+</body>
+</html>
