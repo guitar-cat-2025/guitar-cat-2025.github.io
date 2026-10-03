@@ -212,6 +212,7 @@ function answer(value){
 
  if(entered.length===5){
    locked=true; total++;
+
    const allCorrect=!groupMistakes.some(Boolean);
 
    if(allCorrect){
@@ -225,7 +226,7 @@ function answer(value){
      const box=document.createElement("div"); box.className="compare";
      const t2=document.createElement("div"); t2.className="compareTitle"; t2.textContent="CORRECT";
      const r2=document.createElement("div"); r2.className="compareRow";
-     current.map(target).forEach(v=>{const c=document.createElement("div");c.className="compareCell";c.textContent=v;r2.appendChild(c)});
+     current.map(target).forEach((v,i)=>{const c=document.createElement("div");c.className="compareCell "+(groupMistakes[i]?"bad":"good");c.textContent=v;r2.appendChild(c)});
      box.append(t2,r2); m.appendChild(box);
    }
 
