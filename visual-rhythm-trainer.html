@@ -12,9 +12,7 @@
   --accent:#78e6c8;
 }
 
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
   margin:0;
@@ -30,9 +28,7 @@ main{
   padding:18px;
 }
 
-.top{
-  text-align:center;
-}
+.top{text-align:center}
 
 .top h1{
   margin:6px 0;
@@ -89,22 +85,24 @@ button#start{
   gap:8px;
 }
 
-.bpm input{
-  width:150px;
-}
+.bpm input{width:150px}
+.bpm strong{min-width:62px}
 
-.bpm strong{
-  min-width:62px;
-}
-
-.grid{
+.visual-grid{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(2,1fr);
   gap:8px;
   margin-top:12px;
 }
 
-.grid button{
+.note-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-top:8px;
+}
+
+.note-grid button{
   padding:12px 5px;
 }
 
@@ -119,6 +117,7 @@ button#start{
 
 .beatdots{
   position:absolute;
+  z-index:10;
   left:0;
   right:0;
   top:18px;
@@ -139,9 +138,13 @@ button#start{
   box-shadow:0 0 18px var(--accent);
 }
 
+/* ----------------
+   ボール
+---------------- */
+
 .ball{
   position:absolute;
-  z-index:2;
+  z-index:3;
   width:52px;
   height:52px;
   border-radius:50%;
@@ -161,7 +164,7 @@ button#start{
 
 .floor{
   position:absolute;
-  z-index:1;
+  z-index:2;
   left:9%;
   right:9%;
   bottom:64px;
@@ -175,8 +178,62 @@ button#start{
   box-shadow:0 0 22px var(--accent);
 }
 
+/* ----------------
+   波紋
+---------------- */
+
+.ripple-area{
+  position:absolute;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+.ripple-center{
+  position:absolute;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:var(--accent);
+  box-shadow:
+    0 0 16px var(--accent),
+    0 0 32px #78e6c855;
+}
+
+.ripple{
+  position:absolute;
+  width:30px;
+  height:30px;
+  border:3px solid var(--accent);
+  border-radius:50%;
+  opacity:0;
+  transform:scale(0.2);
+}
+
+.ripple.go{
+  animation:rippleMove var(--ripple-time) linear forwards;
+}
+
+@keyframes rippleMove{
+  0%{
+    opacity:.95;
+    transform:scale(.25);
+  }
+
+  70%{
+    opacity:.45;
+  }
+
+  100%{
+    opacity:0;
+    transform:scale(8.5);
+  }
+}
+
 .count{
   position:absolute;
+  z-index:10;
   bottom:17px;
   left:0;
   right:0;
@@ -198,11 +255,12 @@ button#start{
 }
 
 @media(max-width:520px){
+
   .stage{
     height:300px;
   }
 
-  .grid{
+  .note-grid{
     grid-template-columns:repeat(2,1fr);
   }
 }
@@ -232,7 +290,12 @@ button#start{
 
   </div>
 
-  <div class="grid">
+  <div class="visual-grid">
+    <button class="visual active" data-visual="ball">● ボール</button>
+    <button class="visual" data-visual="ripple">◎ 波紋</button>
+  </div>
+
+  <div class="note-grid">
 
     <button class="mode active" data-div="1">
       ♩ 4分
@@ -262,8 +325,11 @@ button#start{
     </div>
 
     <div class="ball"></div>
-
     <div class="floor"></div>
+
+    <div class="ripple-area">
+      <div class="ripple-center"></div>
+    </div>
 
     <div class="count">
       <span id="beat">1</span>
@@ -272,9 +338,8 @@ button#start{
 
   </div>
 
-  <p class="hint">
+  <p class="hint" id="hint">
     ボールが床に着く瞬間が音の位置。
-    4分 → 8分 → 3連 → 16分を切り替えて比べてみよう。
   </p>
 
 </div>
@@ -298,11 +363,17 @@ const ball =
 const floor =
   document.querySelector('.floor');
 
+const rippleArea =
+  document.querySelector('.ripple-area');
+
 const beatEl =
   document.querySelector('#beat');
 
 const subEl =
   document.querySelector('#sub');
+
+const hint =
+  document.querySelector('#hint');
 
 const dots =
   [...document.querySelectorAll('.beatdot')];
@@ -310,9 +381,14 @@ const dots =
 const modes =
   [...document.querySelectorAll('.mode')];
 
+const visuals =
+  [...document.querySelectorAll('.visual')];
+
 let playing = false;
 let div = 1;
 let bpm = 80;
+let visual = 'ball';
+
 let t0 = 0;
 let raf = 0;
 let audio = null;
@@ -335,14 +411,9 @@ function click(accent){
       )();
   }
 
-  const o =
-    audio.createOscillator();
-
-  const g =
-    audio.createGain();
-
-  const now =
-    audio.currentTime;
+  const o = audio.createOscillator();
+  const g = audio.createGain();
+  const now = audio.currentTime;
 
   o.frequency.value =
     accent ? 1050 : 720;
@@ -364,6 +435,10 @@ function click(accent){
   o.stop(now + .05);
 }
 
+/* ----------------
+   ボール位置
+---------------- */
+
 function groundY(){
 
   return (
@@ -380,6 +455,78 @@ function placeBall(){
   ball.style.transform =
     `translateY(${groundY()}px)`;
 }
+
+/* ----------------
+   波紋発生
+---------------- */
+
+function makeRipple(duration){
+
+  const r =
+    document.createElement('div');
+
+  r.className =
+    'ripple';
+
+  r.style.setProperty(
+    '--ripple-time',
+    `${duration}ms`
+  );
+
+  rippleArea.appendChild(r);
+
+  requestAnimationFrame(() => {
+    r.classList.add('go');
+  });
+
+  setTimeout(
+    () => r.remove(),
+    duration + 100
+  );
+}
+
+/* ----------------
+   表示モード
+---------------- */
+
+function applyVisual(){
+
+  if(visual === 'ball'){
+
+    ball.style.display =
+      'block';
+
+    floor.style.display =
+      'block';
+
+    rippleArea.style.display =
+      'none';
+
+    hint.textContent =
+      'ボールが床に着く瞬間が音の位置。';
+
+    placeBall();
+
+  }else{
+
+    ball.style.display =
+      'none';
+
+    floor.style.display =
+      'none';
+
+    rippleArea.style.display =
+      'flex';
+
+    hint.textContent =
+      '波紋が広がり始める瞬間が音の位置。';
+
+  }
+}
+
+/* ----------------
+   アニメーション
+---------------- */
 
 function frame(now){
 
@@ -409,30 +556,33 @@ function frame(now){
       step / div
     ) % 4;
 
-  const bounce =
-    Math.sin(
-      Math.PI * phase
-    );
+  if(visual === 'ball'){
 
-  const ground =
-    groundY();
+    const bounce =
+      Math.sin(
+        Math.PI * phase
+      );
 
-  const height =
-    Math.min(
-      145,
-      Math.max(
-        70,
-        ground - 55
-      )
-    );
+    const ground =
+      groundY();
 
-  const y =
-    ground
-    -
-    height * bounce;
+    const height =
+      Math.min(
+        145,
+        Math.max(
+          70,
+          ground - 55
+        )
+      );
 
-  ball.style.transform =
-    `translateY(${y}px)`;
+    const y =
+      ground
+      -
+      height * bounce;
+
+    ball.style.transform =
+      `translateY(${y}px)`;
+  }
 
   beatEl.textContent =
     beat + 1;
@@ -457,17 +607,30 @@ function frame(now){
       step % div === 0
     );
 
-    floor.classList.add(
-      'hit'
-    );
+    if(visual === 'ball'){
 
-    setTimeout(
-      () =>
-        floor.classList.remove(
-          'hit'
-        ),
-      55
-    );
+      floor.classList.add(
+        'hit'
+      );
+
+      setTimeout(
+        () =>
+          floor.classList.remove(
+            'hit'
+          ),
+        55
+      );
+
+    }else{
+
+      makeRipple(
+        Math.max(
+          180,
+          subMs * .95
+        )
+      );
+
+    }
   }
 
   raf =
@@ -475,6 +638,10 @@ function frame(now){
       frame
     );
 }
+
+/* ----------------
+   START / STOP
+---------------- */
 
 start.onclick =
 async () => {
@@ -485,6 +652,7 @@ async () => {
   if(playing){
 
     if(!audio){
+
       audio =
         new (
           window.AudioContext ||
@@ -517,9 +685,21 @@ async () => {
     start.textContent =
       '▶ START';
 
-    placeBall();
+    dots.forEach(
+      d =>
+        d.classList.remove('on')
+    );
+
+    if(visual === 'ball'){
+      placeBall();
+    }
+
   }
 };
+
+/* ----------------
+   BPM
+---------------- */
 
 slider.oninput =
 () => {
@@ -539,6 +719,10 @@ slider.oninput =
       -1;
   }
 };
+
+/* ----------------
+   音符切替
+---------------- */
 
 modes.forEach(
   button => {
@@ -569,18 +753,64 @@ modes.forEach(
   }
 );
 
+/* ----------------
+   視覚パターン切替
+---------------- */
+
+visuals.forEach(
+  button => {
+
+    button.onclick =
+    () => {
+
+      visual =
+        button.dataset.visual;
+
+      visuals.forEach(
+        b =>
+          b.classList.toggle(
+            'active',
+            b === button
+          )
+      );
+
+      rippleArea
+        .querySelectorAll('.ripple')
+        .forEach(
+          r => r.remove()
+        );
+
+      applyVisual();
+
+      if(playing){
+
+        t0 =
+          performance.now();
+
+        lastStep =
+          -1;
+      }
+    };
+  }
+);
+
 window.addEventListener(
   'resize',
   () => {
 
-    if(!playing){
+    if(
+      !playing &&
+      visual === 'ball'
+    ){
       placeBall();
     }
   }
 );
 
 requestAnimationFrame(
-  placeBall
+  () => {
+    applyVisual();
+  }
 );
 
 </script>
