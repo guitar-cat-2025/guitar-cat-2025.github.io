@@ -109,7 +109,7 @@ h1{font-size:22px;margin:7px 0 28px;font-weight:700}
   </div>
   <button class="swap" id="swap" aria-label="出題と回答を入れ替える">⇄</button>
 </div>
-<div class="direction" id="direction">EN → JP</div>
+
 <button class="reset" id="reset">RESET SCORE</button>
 </main>
 
@@ -125,7 +125,7 @@ let total=0, correct=0, streak=0, locked=false, previousSingle=null, previousGro
 const q=document.getElementById("question");
 const a=document.getElementById("answers");
 const m=document.getElementById("message");
-const directionEl=document.getElementById("direction");
+
 
 function source(n){return direction==="en-jp"?n.en:n.jp}
 function target(n){return direction==="en-jp"?n.jp:n.en}
@@ -252,7 +252,6 @@ document.querySelectorAll(".seg").forEach(btn=>btn.onclick=()=>{
 
 document.getElementById("swap").onclick=()=>{
  direction=direction==="en-jp"?"jp-en":"en-jp";
- directionEl.textContent=direction==="en-jp"?"EN → JP":"JP → EN";
  previousSingle=null;previousGroup="";
  renderAnswers();next();
 };
