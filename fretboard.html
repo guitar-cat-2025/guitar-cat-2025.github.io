@@ -1,6 +1,6 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>ギター指板 音名ハイライト Ver.33</title>
+<title>ギター指板 音名ハイライト Ver.34</title>
 <style>
 *{box-sizing:border-box}:root{--bg:#101114;--panel:#1b1d22;--board:#20262c;--line:#aeb4ba;--muted:#969ba2}
 body{margin:0;background:var(--bg);color:#f5f5f6;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}
@@ -74,6 +74,50 @@ body{padding-top:28px}.wrap{width:min(1180px,94vw);max-width:none}h1{font-size:2
     width:min(1120px,92vw) !important;
     max-width:none !important;
   }
+}
+
+
+@media (min-width:800px){
+  /* PC: center the whole tool instead of letting the enlarged board overflow right */
+  .app{
+    width:min(1180px,94vw) !important;
+    max-width:none !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+  }
+
+  /* Keep board + open-string labels + fret numbers on exactly the same grid */
+  .fretwrap,.nums{
+    width:100% !important;
+    max-width:none !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+  }
+  .fretwrap{grid-template-columns:38px minmax(0,1fr) !important}
+  .nums{grid-template-columns:38px repeat(13,minmax(0,1fr)) !important}
+
+  .board,.labels{height:300px !important}
+  .slab{
+    width:38px !important;
+    font-size:12px !important;
+    height:30px !important;
+  }
+  .slab small{font-size:9px !important}
+
+  /* Position markers use percentages so they stay exact at any PC board height */
+  .posmark.one{top:50% !important}
+  .posmark.two{
+    top:0 !important;
+    left:0 !important;
+    width:100% !important;
+    height:100% !important;
+  }
+  .posmark.two i:first-child{top:30% !important}
+  .posmark.two i:last-child{top:70% !important}
+  .posmark i{width:10px !important;height:10px !important}
+
+  .nums{margin-top:10px !important;height:30px !important}
+  .nums div{font-size:11px !important}
 }
 
 </style></head><body><div class="app">
